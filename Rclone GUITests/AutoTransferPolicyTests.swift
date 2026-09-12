@@ -410,8 +410,18 @@ struct AutoTransferPolicySortTests {
 
     @Test("Permutation-complétude : mêmes éléments en sortie qu'en entrée")
     func permutationComplete() {
-        let input = (0..<50).map {
-            candidate("t\($0)", order: $0 % 3 - 1, bytes: Int64(($0 * 37) % 11) - 2, started: Double($0 % 7))
+        // Expression décomposée en sous-expressions typées : le type-checker
+        // Swift n'arrive pas à inférer la closure `(0..<50).map { … }` en un
+        // seul passage (composite : modulo ×3, conversions Int64/Double,
+        // interpolation de chaîne) et abandonne avec « unable to type-check
+        // this expression in reasonable time ».
+        var input: [AutoTransferPolicy.QueueCandidate] = []
+        input.reserveCapacity(50)
+        for i in 0..<50 {
+            let order: Int = i % 3 - 1
+            let bytes: Int64 = Int64((i * 37) % 11) - 2
+            let started: TimeInterval = Double(i % 7)
+            input.append(candidate("t\(i)", order: order, bytes: bytes, started: started))
         }
         let sorted = AutoTransferPolicy.sortSmallFirst(input, now: testNow)
         #expect(sorted.count == input.count)

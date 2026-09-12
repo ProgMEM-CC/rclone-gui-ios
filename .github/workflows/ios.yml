@@ -92,7 +92,8 @@ jobs:
 
       - name: Verify archive structure
         run: |
-          APP="build/RcloneGUI-CI.xcarchive/Products/Applications/Rclone GUI.app"
+          # PRODUCT_NAME = RcloneGUI → l'app archivée est RcloneGUI.app.
+          APP="build/RcloneGUI-CI.xcarchive/Products/Applications/RcloneGUI.app"
           if [ ! -d "$APP" ]; then
             echo "ERROR: archive missing the .app bundle"
             ls -la "build/RcloneGUI-CI.xcarchive/Products/Applications/" || true
@@ -132,6 +133,97 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             DEVELOPMENT_TEAM="" \
             PROVISIONING_PROFILE_SPECIFIER=""
+
+  build-unsigned-ipa:
+    name: Unsigned IPA (artifact)
+    # Produit une IPA non signée (Payload/.app zippé, aucun certificat requis)
+    # et la publie dans les artifacts du run, pour sideload / QA interne.
+    # Frameworks/RcloneKit.xcframework est gitignore : il est reconstruit ici
+    # via scripts/build-rclone.sh (lit la cible iOS déployée dans le pbxproj),
+    # sinon le link du target app échoue.
+    # Pas déclenché sur PR : le build gomobile ajoute ~20 min par run.
+    # Pas de `needs:` : ce job construit lui-même le framework et reste
+    # utile (livrable QA) même si le job de tests est rouge.
+    if: github.event_name != 'pull_request'
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    env:
+      PROJECT: Rclone GUI.xcodeproj
+      SCHEME: Rclone GUI
+      ARCHIVE_PATH: build/RcloneGUI-unsigned.xcarchive
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select latest Xcode
+        run: |
+          # Les images macos-15 livrent plusieurs Xcodes ; le projet utilise
+          # des réglages Xcode 26+ (SWIFT_DEFAULT_ACTOR_ISOLATION…) → prendre
+          # le plus récent disponible.
+          XCODE_APP=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          echo "Selecting $XCODE_APP"
+          sudo xcode-select -s "$XCODE_APP"
+          xcodebuild -version
+
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+
+      - name: Build RcloneKit.xcframework
+        run: ./scripts/build-rclone.sh
+
+      - name: Archive (unsigned, generic iOS device)
+        run: |
+          set -o pipefail
+          xcodebuild archive \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$ARCHIVE_PATH" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER=""
+
+      - name: Package unsigned IPA
+        run: |
+          APP="$ARCHIVE_PATH/Products/Applications/RcloneGUI.app"
+          if [ ! -d "$APP" ]; then
+            echo "ERROR: archive missing the .app bundle"
+            ls -la "$ARCHIVE_PATH/Products/Applications/" || true
+            exit 1
+          fi
+          mkdir -p build/export/Payload
+          ditto "$APP" "build/export/Payload/RcloneGUI.app"
+          cd build/export
+          zip -qry RcloneGUI-unsigned.ipa Payload
+
+      - name: Verify IPA
+        run: |
+          IPA="build/export/RcloneGUI-unsigned.ipa"
+          if [ ! -f "$IPA" ]; then
+            echo "ERROR: IPA not produced"
+            exit 1
+          fi
+          unzip -l "$IPA" | grep -q "Payload/RcloneGUI.app/" || {
+            echo "ERROR: malformed IPA (Payload/RcloneGUI.app missing)"
+            exit 1
+          }
+          echo "IPA OK"
+          du -sh "$IPA"
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RcloneGUI-unsigned-ipa-${{ github.sha }}
+          path: build/export/RcloneGUI-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 14
 
   transparency-guard:
     name: Glass Engine — garde « 0 appel maison »

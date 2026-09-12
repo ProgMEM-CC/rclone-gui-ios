@@ -202,11 +202,28 @@ struct FolderView: View {
         }
     }
 
+    // Le corps est découpé en sous-expressions : la chaîne de modifiers
+    // complète dépassait le budget d'inférence du type-checker Swift
+    // ("unable to type-check this expression in reasonable time").
+    // L'ordre des modifiers est strictement identique à l'ancienne chaîne.
     var body: some View {
-        let main = content
+        let main = feedback(dialogs(presentations(lifecycle(contentCore))))
+        #if os(iOS)
+        main.rgInlineNavTitle()
+        #else
+        main
+        #endif
+    }
+
+    private var contentCore: some View {
+        content
             .navigationTitle(displayTitle)
             .searchable(text: $query)
-            .toolbar {
+            .toolbar { folderToolbar }
+    }
+
+    @ToolbarContentBuilder
+    private var folderToolbar: some ToolbarContent {
                 ToolbarItem(placement: .navigation) {
                     if !displayedEntries.isEmpty {
                         Button(selectionMode ? "OK" : "Sélectionner") {
@@ -244,7 +261,10 @@ struct FolderView: View {
                 ToolbarItem(placement: .primaryAction) {
                     actionsMenu
                 }
-            }
+    }
+
+    private func lifecycle(_ base: some View) -> some View {
+        base
             .task(id: TaskKey(remote: remote, path: path)) {
                 await load()
                 activeTransferByPath = computeActiveTransferByPath()
@@ -280,6 +300,10 @@ struct FolderView: View {
             .onChange(of: query) { _, _ in recomputeDisplayed() }
             .onChange(of: sortMode) { _, _ in recomputeDisplayed() }
             .onChange(of: sortDescending) { _, _ in recomputeDisplayed() }
+    }
+
+    private func presentations(_ base: some View) -> some View {
+        base
             .sheet(item: $renameTarget) { entry in
                 RenameSheetView(
                     entry: entry,
@@ -385,6 +409,10 @@ struct FolderView: View {
                 selection: $selectedPhotoItems,
                 matching: .any(of: [.images, .videos])
             )
+    }
+
+    private func dialogs(_ base: some View) -> some View {
+        base
             .onChange(of: selectedPhotoItems) { _, items in
                 guard !items.isEmpty else { return }
                 Task { await uploadPhotos(items) }
@@ -446,15 +474,13 @@ struct FolderView: View {
             } message: {
                 Text(pasteConflictMessage)
             }
+    }
+
+    private func feedback(_ base: some View) -> some View {
+        base
             .sensoryFeedback(.success, trigger: hapticSuccessTrigger)
             .sensoryFeedback(.warning, trigger: hapticWarningTrigger)
             .sensoryFeedback(.selection, trigger: hapticImpactTrigger)
-
-        #if os(iOS)
-        main.rgInlineNavTitle()
-        #else
-        main
-        #endif
     }
 
     private var deleteDialogTitle: String {

@@ -234,7 +234,7 @@ mkdir -p "$STAGE_DIR"
 # Args:
 #   $1 framework_dir   path to the slice's RcloneKit.framework
 #   $2 sdk             xcrun --sdk value (iphoneos | macosx)
-#   $3 target_triple   clang -target value (e.g. arm64-apple-ios26.4)
+#   $3 target_triple   clang -target value (e.g. arm64-apple-ios18.0)
 #   $4 dsym_out        path to write RcloneKit.framework.dSYM
 wrap_slice() {
     local framework_dir="$1" sdk="$2" target_triple="$3" dsym_out="$4"
