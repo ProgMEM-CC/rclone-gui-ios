@@ -41,14 +41,33 @@ struct Rclone_GUIApp: App {
         // constraints and non-optional fields that CloudKit rejects. Without
         // .none here, SwiftData detects the entitlement and tries to mirror
         // every entity through CloudKit, crashing at container init.
-        let modelConfiguration = ModelConfiguration(
-            "RcloneGUI",
-            schema: schema,
-            isStoredInMemoryOnly: false,
-            allowsSave: true,
-            groupContainer: .identifier(AppGroup.identifier),
-            cloudKitDatabase: .none
-        )
+        //
+        // The App Group is used ONLY when it is actually provisioned. Unsigned
+        // builds (sideload/TrollStore QA IPAs) carry no entitlements, and
+        // SwiftData fatals at launch with "Unable to find App Group Container
+        // in Entitlements" if handed an unprovisioned group identifier — a
+        // crash that runs BEFORE CrashReporter.install() (property initializer
+        // ordering) and so produces no diagnostic at all. Mirrors the fallback
+        // strategy of AppGroup.containerURL for the rest of the app.
+        let modelConfiguration: ModelConfiguration
+        if AppGroup.isAppGroupProvisioned {
+            modelConfiguration = ModelConfiguration(
+                "RcloneGUI",
+                schema: schema,
+                isStoredInMemoryOnly: false,
+                allowsSave: true,
+                groupContainer: .identifier(AppGroup.identifier),
+                cloudKitDatabase: .none
+            )
+        } else {
+            modelConfiguration = ModelConfiguration(
+                "RcloneGUI",
+                schema: schema,
+                isStoredInMemoryOnly: false,
+                allowsSave: true,
+                cloudKitDatabase: .none
+            )
+        }
 
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
