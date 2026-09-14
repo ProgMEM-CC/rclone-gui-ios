@@ -4,14 +4,17 @@
 //
 //  Détecte l'interaction utilisateur (taps, scrolls, gestures) sur toutes les
 //  windows actives. Quand l'utilisateur navigue activement (= a interagi
-//  dans les 5 dernières secondes), `isUserActive` passe à true et notifie
+//  dans les 3 dernières secondes), `isUserActive` passe à true et notifie
 //  via `userActivityDidChange`. TransferQueue s'y abonne pour throttler la
-//  bandwidth rclone et libérer du CPU/network pour le UI.
+//  bande passante rclone et libérer du CPU/network pour le UI.
 //
-//  Implémentation : un PassthroughGestureRecognizer attaché à chaque UIWindow
-//  qui passe en .failed à chaque touchesBegan sans consommer l'event — donc
-//  toutes les autres gesture recognizers de SwiftUI continuent à fonctionner
-//  normalement. Un Task background décide quand on bascule vers inactive.
+//  Implémentation : RGUIApplication (UIApplication subclass, NSPrincipalClass)
+//  observe chaque UIEvent tactile dans sendEvent() et poste
+//  didReceiveUserTouchNotification. C'est de la pure observation : aucun
+//  gesture recognizer n'est créé, donc aucun arbitrage de gestures n'est
+//  perturbé. (L'ancienne approche — un recognizer .failed attaché à chaque
+//  UIWindow — bloquait la sélection de fichiers dans le document picker et
+//  les taps dans les sheets sur iOS 18.0.)
 //
 
 #if os(iOS)
@@ -37,8 +40,7 @@ public final class UserActivityMonitor {
 
     private var lastActivity: Date = .distantPast
     private var observerTask: Task<Void, Never>?
-    private var gestureRecognizers: [ObjectIdentifier: PassthroughGestureRecognizer] = [:]
-    private var sceneObserver: NSObjectProtocol?
+    private var touchObserver: NSObjectProtocol?
     private var didStart = false
 
     /// True si l'utilisateur a interagi dans les `inactivityThreshold` dernières
@@ -55,49 +57,22 @@ public final class UserActivityMonitor {
     }
 
     /// Démarre la détection. Idempotent — appel multiple OK. À appeler au
-    /// boot de l'app après que les premières windows soient instanciées.
+    /// boot de l'app. sendEvent() poste sur le main thread ; l'observer
+    /// (`queue: .main`) fait juste un hop MainActor avant de l'horodater.
     public func start() {
         guard !didStart else { return }
         didStart = true
-        attachToCurrentWindows()
-        observeNewScenes()
-        startInactivityObserver()
-    }
-
-    private func attachToCurrentWindows() {
-        for scene in UIApplication.shared.connectedScenes {
-            guard let windowScene = scene as? UIWindowScene else { continue }
-            for window in windowScene.windows {
-                attach(to: window)
-            }
-        }
-    }
-
-    private func attach(to window: UIWindow) {
-        let key = ObjectIdentifier(window)
-        guard gestureRecognizers[key] == nil else { return }
-        let recognizer = PassthroughGestureRecognizer { [weak self] in
-            self?.userDidInteract()
-        }
-        recognizer.cancelsTouchesInView = false
-        recognizer.delaysTouchesBegan = false
-        recognizer.delaysTouchesEnded = false
-        window.addGestureRecognizer(recognizer)
-        gestureRecognizers[key] = recognizer
-    }
-
-    private func observeNewScenes() {
-        // Capte les nouvelles windowScene (split-view iPad, multitâche) pour
-        // attacher le recognizer aussi sur leurs windows.
-        sceneObserver = NotificationCenter.default.addObserver(
-            forName: UIScene.didActivateNotification,
+        RGUIApplication.beginObservingTouches()
+        touchObserver = NotificationCenter.default.addObserver(
+            forName: RGUIApplication.didReceiveUserTouchNotification,
             object: nil,
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor [weak self] in
-                self?.attachToCurrentWindows()
+                self?.userDidInteract()
             }
         }
+        startInactivityObserver()
     }
 
     private func userDidInteract() {
@@ -122,38 +97,6 @@ public final class UserActivityMonitor {
     }
 }
 
-/// GestureRecognizer transparent qui notifie à chaque contact (début, mouvement
-/// et fin) et passe immédiatement en .failed pour ne pas consommer l'event.
-/// Capter aussi touchesMoved/touchesEnded est essentiel pour que les drags et
-/// scrolls longs gardent `lastActivity` à jour — sinon un scroll de 10 s ne
-/// rafraîchirait l'horodatage qu'au touchesBegan initial et le throttle se
-/// relâcherait à mi-geste. Les gestures SwiftUI continuent de fonctionner.
-private final class PassthroughGestureRecognizer: UIGestureRecognizer {
-    private let onTouch: () -> Void
-
-    init(onTouch: @escaping () -> Void) {
-        self.onTouch = onTouch
-        super.init(target: nil, action: nil)
-    }
-
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
-        onTouch()
-        state = .failed
-    }
-
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
-        onTouch()
-    }
-
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
-        onTouch()
-    }
-
-    override func canPrevent(_ preventedGestureRecognizer: UIGestureRecognizer) -> Bool { false }
-    override func canBePrevented(by preventingGestureRecognizer: UIGestureRecognizer) -> Bool { false }
-    override func shouldRequireFailure(of otherGestureRecognizer: UIGestureRecognizer) -> Bool { false }
-    override func shouldBeRequiredToFail(by otherGestureRecognizer: UIGestureRecognizer) -> Bool { false }
-}
 #elseif os(macOS)
 import Foundation
 import AppKit

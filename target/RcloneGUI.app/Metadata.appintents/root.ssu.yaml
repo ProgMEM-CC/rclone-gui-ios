@@ -1,0 +1,409 @@
+apiVersion: ssu/v1
+nlu:
+  shortcuts:
+    bundleIdentifier: com.rougetet.rclone-gui
+    intents:
+    - metadata:
+        name: ListRemotesIntent_0
+        title: Liste les remotes rclone
+      corpuses:
+        training:
+        - locale: it
+          utterances:
+          - '{${+prefix} }Elenca i miei remote ${+applicationName}'
+          - '{${+prefix} }Mostra i remote ${+applicationName}'
+        - locale: fr
+          utterances:
+          - '{${+prefix} }Liste mes remotes ${+applicationName}'
+          - '{${+prefix} }Affiche les remotes ${+applicationName}'
+        - locale: pt-BR
+          utterances:
+          - '{${+prefix} }Mostrar remotes do ${+applicationName}'
+          - '{${+prefix} }Listar meus remotes do ${+applicationName}'
+        - locale: ko
+          utterances:
+          - '{${+prefix} }내 ${+applicationName} 원격 목록'
+          - '{${+prefix} }${+applicationName} 원격 보기'
+        - locale: en
+          utterances:
+          - '{${+prefix} }List my remotes ${+applicationName}'
+        - locale: zh-Hant
+          utterances:
+          - 列出我的 ${+applicationName} 遠端
+          - 顯示 ${+applicationName} 遠端
+        - locale: ja
+          utterances:
+          - '{${+prefix} }${+applicationName} のリモートを表示'
+          - '{${+prefix} }${+applicationName} のリモートを一覧表示'
+        - locale: nl
+          utterances:
+          - '{${+prefix} }Mijn ${+applicationName}-remotes tonen'
+          - '{${+prefix} }${+applicationName}-remotes weergeven'
+        - locale: es
+          utterances:
+          - '{${+prefix} }Muestra los remotes de ${+applicationName}'
+          - '{${+prefix} }Lista mis remotes de ${+applicationName}'
+        - locale: ru
+          utterances:
+          - '{${+prefix} }Показать мои remotes ${+applicationName}'
+          - '{${+prefix} }Показать remotes ${+applicationName}'
+        - locale: pl
+          utterances:
+          - Pokaż moje remotes ${+applicationName}
+          - Wyświetl remotes ${+applicationName}
+        - locale: zh-Hans
+          utterances:
+          - 显示 ${+applicationName} 远程
+          - 列出我的 ${+applicationName} 远程
+        - locale: de
+          utterances:
+          - '{${+prefix} }${+applicationName}-Remotes anzeigen'
+          - '{${+prefix} }Meine ${+applicationName}-Remotes auflisten'
+    - metadata:
+        name: OpenRemoteIntent_1
+        title: Ouvrir un remote
+      corpuses:
+        training:
+        - locale: it
+          utterances:
+          - '{${+prefix} }Apri un remote ${+applicationName}'
+        - locale: fr
+          utterances:
+          - '{${+prefix} }Ouvrir un remote ${+applicationName}'
+        - locale: pt-BR
+          utterances:
+          - '{${+prefix} }Abrir um remote do ${+applicationName}'
+        - locale: ko
+          utterances:
+          - '{${+prefix} }${+applicationName} 원격 열기'
+        - locale: en
+          utterances:
+          - '{${+prefix} }Open a remote ${+applicationName}'
+        - locale: zh-Hant
+          utterances:
+          - 開啟 ${+applicationName} 遠端
+        - locale: ja
+          utterances:
+          - '{${+prefix} }${+applicationName} のリモートを開く'
+        - locale: nl
+          utterances:
+          - '{${+prefix} }Een ${+applicationName}-remote openen'
+        - locale: es
+          utterances:
+          - '{${+prefix} }Abrir un remote de ${+applicationName}'
+        - locale: ru
+          utterances:
+          - '{${+prefix} }Открыть remote ${+applicationName}'
+        - locale: pl
+          utterances:
+          - Otwórz remote ${+applicationName}
+        - locale: zh-Hans
+          utterances:
+          - 打开 ${+applicationName} 远程
+        - locale: de
+          utterances:
+          - '{${+prefix} }Ein ${+applicationName}-Remote öffnen'
+    - metadata:
+        name: RunPhotoSyncIntent_2
+        title: Sauvegarder mes photos
+      corpuses:
+        training:
+        - locale: it
+          utterances:
+          - '{${+prefix} }Sauvegarder mes photos avec ${+applicationName}'
+          - '{${+prefix} }Lancer la sauvegarde photos ${+applicationName}'
+        - locale: fr
+          utterances:
+          - '{${+prefix} }Sauvegarder mes photos avec ${+applicationName}'
+          - '{${+prefix} }Lancer la sauvegarde photos ${+applicationName}'
+        - locale: pt-BR
+          utterances:
+          - '{${+prefix} }Iniciar o backup de fotos no ${+applicationName}'
+          - '{${+prefix} }Fazer backup das minhas fotos com o ${+applicationName}'
+        - locale: ko
+          utterances:
+          - '{${+prefix} }Sauvegarder mes photos avec ${+applicationName}'
+          - '{${+prefix} }Lancer la sauvegarde photos ${+applicationName}'
+        - locale: en
+          utterances:
+          - '{${+prefix} }Sauvegarder mes photos avec ${+applicationName}'
+          - '{${+prefix} }Lancer la sauvegarde photos ${+applicationName}'
+        - locale: zh-Hant
+          utterances:
+          - Sauvegarder mes photos avec ${+applicationName}
+          - Lancer la sauvegarde photos ${+applicationName}
+        - locale: ja
+          utterances:
+          - '{${+prefix} }${+applicationName}で写真のバックアップを開始'
+          - '{${+prefix} }${+applicationName}で写真をバックアップ'
+        - locale: nl
+          utterances:
+          - '{${+prefix} }Sauvegarder mes photos avec ${+applicationName}'
+          - '{${+prefix} }Lancer la sauvegarde photos ${+applicationName}'
+        - locale: es
+          utterances:
+          - '{${+prefix} }Iniciar la copia de seguridad de fotos en ${+applicationName}'
+          - '{${+prefix} }Respaldar mis fotos con ${+applicationName}'
+        - locale: ru
+          utterances:
+          - '{${+prefix} }Sauvegarder mes photos avec ${+applicationName}'
+          - '{${+prefix} }Lancer la sauvegarde photos ${+applicationName}'
+        - locale: pl
+          utterances:
+          - Sauvegarder mes photos avec ${+applicationName}
+          - Lancer la sauvegarde photos ${+applicationName}
+        - locale: zh-Hans
+          utterances:
+          - 在${+applicationName}中开始照片备份
+          - 用${+applicationName}备份我的照片
+        - locale: de
+          utterances:
+          - '{${+prefix} }Fotosicherung in ${+applicationName} starten'
+          - '{${+prefix} }Meine Fotos mit ${+applicationName} sichern'
+    - metadata:
+        name: PauseTransfersIntent_3
+        title: Mettre les transferts en pause
+      corpuses:
+        training:
+        - locale: it
+          utterances:
+          - '{${+prefix} }Mettre en pause les transferts ${+applicationName}'
+        - locale: fr
+          utterances:
+          - '{${+prefix} }Mettre en pause les transferts ${+applicationName}'
+        - locale: pt-BR
+          utterances:
+          - '{${+prefix} }Pausar as transferências no ${+applicationName}'
+          - '{${+prefix} }Pausar transferências do ${+applicationName}'
+        - locale: ko
+          utterances:
+          - '{${+prefix} }Mettre en pause les transferts ${+applicationName}'
+        - locale: en
+          utterances:
+          - '{${+prefix} }Mettre en pause les transferts ${+applicationName}'
+        - locale: zh-Hant
+          utterances:
+          - Mettre en pause les transferts ${+applicationName}
+        - locale: ja
+          utterances:
+          - '{${+prefix} }${+applicationName}で転送を一時停止'
+          - '{${+prefix} }${+applicationName}の転送を一時停止'
+        - locale: nl
+          utterances:
+          - '{${+prefix} }Mettre en pause les transferts ${+applicationName}'
+        - locale: es
+          utterances:
+          - '{${+prefix} }Pausar las transferencias en ${+applicationName}'
+          - '{${+prefix} }Pausar transferencias de ${+applicationName}'
+        - locale: ru
+          utterances:
+          - '{${+prefix} }Mettre en pause les transferts ${+applicationName}'
+        - locale: pl
+          utterances:
+          - Mettre en pause les transferts ${+applicationName}
+        - locale: zh-Hans
+          utterances:
+          - 暂停${+applicationName}的传输
+          - 在${+applicationName}中暂停传输
+        - locale: de
+          utterances:
+          - '{${+prefix} }Übertragungen in ${+applicationName} pausieren'
+          - '{${+prefix} }${+applicationName} Übertragungen pausieren'
+    - metadata:
+        name: ResumeTransfersIntent_4
+        title: Reprendre les transferts
+      corpuses:
+        training:
+        - locale: it
+          utterances:
+          - '{${+prefix} }Reprendre les transferts ${+applicationName}'
+        - locale: fr
+          utterances:
+          - '{${+prefix} }Reprendre les transferts ${+applicationName}'
+        - locale: pt-BR
+          utterances:
+          - '{${+prefix} }Retomar transferências do ${+applicationName}'
+          - '{${+prefix} }Retomar as transferências no ${+applicationName}'
+        - locale: ko
+          utterances:
+          - '{${+prefix} }Reprendre les transferts ${+applicationName}'
+        - locale: en
+          utterances:
+          - '{${+prefix} }Reprendre les transferts ${+applicationName}'
+        - locale: zh-Hant
+          utterances:
+          - Reprendre les transferts ${+applicationName}
+        - locale: ja
+          utterances:
+          - '{${+prefix} }${+applicationName}の転送を再開'
+          - '{${+prefix} }${+applicationName}で転送を再開'
+        - locale: nl
+          utterances:
+          - '{${+prefix} }Reprendre les transferts ${+applicationName}'
+        - locale: es
+          utterances:
+          - '{${+prefix} }Reanudar transferencias de ${+applicationName}'
+          - '{${+prefix} }Reanudar las transferencias en ${+applicationName}'
+        - locale: ru
+          utterances:
+          - '{${+prefix} }Reprendre les transferts ${+applicationName}'
+        - locale: pl
+          utterances:
+          - Reprendre les transferts ${+applicationName}
+        - locale: zh-Hans
+          utterances:
+          - 在${+applicationName}中恢复传输
+          - 恢复${+applicationName}的传输
+        - locale: de
+          utterances:
+          - '{${+prefix} }${+applicationName} Übertragungen fortsetzen'
+          - '{${+prefix} }Übertragungen in ${+applicationName} fortsetzen'
+    - metadata:
+        name: +negative
+      corpuses:
+        training:
+        - locale: it
+          utterances:
+          - '{${+prefix} }${+standardAppShortcutNegatives}'
+        - locale: fr
+          utterances:
+          - '{${+prefix} }${+standardAppShortcutNegatives}'
+        - locale: pt-BR
+          utterances:
+          - '{${+prefix} }${+standardAppShortcutNegatives}'
+        - locale: ko
+          utterances:
+          - '{${+prefix} }${+standardAppShortcutNegatives}'
+        - locale: en
+          utterances:
+          - '{${+prefix} }${+standardAppShortcutNegatives}'
+        - locale: zh-Hant
+          utterances: []
+        - locale: ja
+          utterances:
+          - '{${+prefix} }${+standardAppShortcutNegatives}'
+        - locale: nl
+          utterances:
+          - '{${+prefix} }${+standardAppShortcutNegatives}'
+        - locale: es
+          utterances:
+          - '{${+prefix} }${+standardAppShortcutNegatives}'
+        - locale: ru
+          utterances:
+          - '{${+prefix} }${+standardAppShortcutNegatives}'
+        - locale: pl
+          utterances: []
+        - locale: zh-Hans
+          utterances: []
+        - locale: de
+          utterances:
+          - '{${+prefix} }${+standardAppShortcutNegatives}'
+variables:
+- name: +applicationName
+  type: ssu/expansion
+  definitions:
+  - locale: it
+    synomyms:
+    - RcloneGUI
+  - locale: fr
+    synomyms:
+    - Rclone GUI
+  - locale: pt-BR
+    synomyms:
+    - RcloneGUI
+  - locale: ko
+    synomyms:
+    - RcloneGUI
+  - locale: en
+    synomyms:
+    - RcloneGUI
+  - locale: zh-Hant
+    synomyms:
+    - RcloneGUI
+  - locale: ja
+    synomyms:
+    - RcloneGUI
+  - locale: nl
+    synomyms:
+    - RcloneGUI
+  - locale: es
+    synomyms:
+    - RcloneGUI
+  - locale: ru
+    synomyms:
+    - RcloneGUI
+  - locale: pl
+    synomyms:
+    - RcloneGUI
+  - locale: zh-Hans
+    synomyms:
+    - RcloneGUI
+  - locale: de
+    synomyms:
+    - RcloneGUI
+- name: +prefix
+  type: ssu/expansion
+  definitions:
+  - locale: de
+    synomyms:
+      $ref: ssu://Resources/prefix/de.yaml
+  - locale: en
+    synomyms:
+      $ref: ssu://Resources/prefix/en.yaml
+  - locale: es
+    synomyms:
+      $ref: ssu://Resources/prefix/es.yaml
+  - locale: fr
+    synomyms:
+      $ref: ssu://Resources/prefix/fr.yaml
+  - locale: it
+    synomyms:
+      $ref: ssu://Resources/prefix/it.yaml
+  - locale: ja
+    synomyms:
+      $ref: ssu://Resources/prefix/ja.yaml
+  - locale: ko
+    synomyms:
+      $ref: ssu://Resources/prefix/ko.yaml
+  - locale: nl
+    synomyms:
+      $ref: ssu://Resources/prefix/nl.yaml
+  - locale: pt-BR
+    synomyms:
+      $ref: ssu://Resources/prefix/pt.yaml
+  - locale: ru
+    synomyms:
+      $ref: ssu://Resources/prefix/ru.yaml
+- name: +standardAppShortcutNegatives
+  type: ssu/expansion
+  definitions:
+  - locale: de
+    synomyms:
+      $ref: ssu://Resources/standardAppShortcutNegatives/de.yaml
+  - locale: en
+    synomyms:
+      $ref: ssu://Resources/standardAppShortcutNegatives/en.yaml
+  - locale: es
+    synomyms:
+      $ref: ssu://Resources/standardAppShortcutNegatives/es.yaml
+  - locale: fr
+    synomyms:
+      $ref: ssu://Resources/standardAppShortcutNegatives/fr.yaml
+  - locale: it
+    synomyms:
+      $ref: ssu://Resources/standardAppShortcutNegatives/it.yaml
+  - locale: ja
+    synomyms:
+      $ref: ssu://Resources/standardAppShortcutNegatives/ja.yaml
+  - locale: ko
+    synomyms:
+      $ref: ssu://Resources/standardAppShortcutNegatives/ko.yaml
+  - locale: nl
+    synomyms:
+      $ref: ssu://Resources/standardAppShortcutNegatives/nl.yaml
+  - locale: pt-BR
+    synomyms:
+      $ref: ssu://Resources/standardAppShortcutNegatives/pt.yaml
+  - locale: ru
+    synomyms:
+      $ref: ssu://Resources/standardAppShortcutNegatives/ru.yaml
